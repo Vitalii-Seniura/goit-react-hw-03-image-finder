@@ -12,30 +12,35 @@ export class ImageGallery extends React.Component {
     error: null,
     status: '',
     page: 1,
+    totalHits: 0,
   };
 
   componentDidUpdate(prevProps, prevState) {
     const prevName = prevProps.imageName;
     const nextName = this.props.imageName;
     if (prevName !== nextName) {
-      this.setState({ status: 'pending', page: 1, image: [] });
+      this.setState({ status: 'pending', page: 1 });
       fetchImage(nextName, this.state.page)
-        .then(images => this.setState({ images, status: 'resolved' }))
-        .catch(error => this.setState({ status: 'rejected' }));
+        .then(data =>
+          this.setState({
+            images: data.hits,
+            totalHits: data.totalHits,
+            status: 'resolved',
+          })
+        )
+        .catch(error => this.setState({ error, status: 'rejected' }));
     }
+
     if (prevState.page !== this.state.page) {
       this.setState({ status: 'pending' });
       fetchImage(nextName, this.state.page)
-        .then(images =>
+        .then(data =>
           this.setState(prevState => ({
-            images: [...prevState.images, ...images],
+            images: [...prevState.images, ...data.hits],
             status: 'resolved',
           }))
         )
-        .catch(error => this.setState({ status: 'rejected' }));
-    }
-    if (this.state.images === []) {
-      this.setState({ status: 'rejected' });
+        .catch(error => this.setState({ error, status: 'rejected' }));
     }
   }
 
@@ -46,13 +51,14 @@ export class ImageGallery extends React.Component {
   };
 
   render() {
-    const { loader, error, images, status } = this.state;
+    const { loader, error, images, status, page, totalHits } = this.state;
     if (status === 'pending') {
       return <Loader loader={loader} />;
     }
     if (status === 'rejected') {
       <h2>{error.messange}</h2>;
     }
+
     if (status === 'resolved') {
       return (
         <div>
@@ -61,8 +67,9 @@ export class ImageGallery extends React.Component {
               <ImageGalleryItem image={image} key={image.id} />
             ))}
           </ul>
-          <Button onClick={this.loadMore}>Load more</Button>
-          {/* <Button onClick={this.loadMore} /> */}
+          {totalHits > page * 12 && (
+            <Button onClick={this.loadMore}>Load more</Button>
+          )}
         </div>
       );
     }

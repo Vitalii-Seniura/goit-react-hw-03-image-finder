@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import { Modal } from 'components/Modal/Modal';
+import { Modal } from 'components/Modal/Modal';
 import css from './ImageGalleryItem.module.css';
 
 export class ImageGalleryItem extends React.Component {
@@ -8,10 +8,12 @@ export class ImageGalleryItem extends React.Component {
     showModal: false,
   };
 
-  toggleModal = () => {
-    this.setState(state => ({ showModal: !state.showModal }));
+  openModal = () => {
+    this.setState({ isModalOpen: true });
   };
-
+  closeModal = () => {
+    this.setState({ isModalOpen: false });
+  };
   render() {
     const { image } = this.props;
     return (
@@ -20,11 +22,11 @@ export class ImageGalleryItem extends React.Component {
           src={image.webformatURL}
           alt=""
           className={css.galleryItemImage}
-          onClick={this.toggleModal}
+          onClick={this.openModal}
         />
-        {/* {this.state.showModal && (
-          <Modal image={image} onClose={this.toggleModal} />
-        )} */}
+        {this.state.isModalOpen && (
+          <Modal image={image} onClose={this.closeModal} />
+        )}
       </li>
     );
   }

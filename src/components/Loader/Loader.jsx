@@ -3,8 +3,8 @@ import { ProgressBar } from 'react-loader-spinner';
 export const Loader = () => {
   return (
     <ProgressBar
-      height="80"
-      width="80"
+      height="100"
+      width="100"
       ariaLabel="progress-bar-loading"
       wrapperStyle={{}}
       wrapperClass="progress-bar-wrapper"
